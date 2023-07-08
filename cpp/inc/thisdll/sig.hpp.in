@@ -1,0 +1,40 @@
+#ifndef __<(PREF)_SIG_H
+#define __<(PREF)_SIG_H
+
+#include "<(DLLNAME)/env<(HDREXT)"
+
+#ifdef <(PREF)_DYNIMP
+    #define __<(PREF)_LPROC(rettype, name) typedef rettype (*name)
+#else
+    #if __<(PREF)_DBG
+        #define __<(PREF)_STC __<(PREF)_EXP
+        #define __<(PREF)_HID __<(PREF)_EXP
+    #else
+        #define __<(PREF)_STC static
+    #endif
+    #ifdef _WIN32
+        #define __<(PREF)_IMP __declspec(dllimport)
+        #define __<(PREF)_EXP __declspec(dllexport)
+        #ifndef __<(PREF)_HID
+            #define __<(PREF)_HID
+        #endif
+    #else
+        #define __<(PREF)_EXP __attribute__((visilibity("default")))
+        #define __<(PREF)_IMP __<(PREF)_EXP
+        #ifndef __<(PREF)_HID
+            #define __<(PREF)_HID __attribute__((visilibity("hidden")))
+        #endif
+    #endif
+    #if __<(PREF)_BUILD
+        #define __<(PREF)_PORT __<(PREF)_EXP
+    #else
+        #define __<(PREF)_PORT __<(PREF)_IMP
+    #endif
+
+    #define __<(PREF)_PROCI(rettype, name) rettype name
+    #define __<(PREF)_LPROC(rettype, name) __<(PREF)_PORT __<(PREF)_PROCI(rettype, name)
+    #define __<(PREF)_HPROC(rettype, name) __<(PREF)_HID __<(PREF)_PROCI(rettype, name)
+    #define __<(PREF)_SPROC(rettype, name) __<(PREF)_STC __<(PREF)_PROCI(rettype, name)
+#endif
+
+#endif // guard

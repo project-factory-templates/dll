@@ -1,0 +1,47 @@
+PREFIX ?= /usr/local
+INCDIR ?= include
+LIBDIR ?= lib
+
+SRCS := $(wildcard src/*.<(EXT))
+SRCS := $(SRCS:src/%=%)
+OBJS := $(SRCS:%.<(EXT)=%.obj)
+
+<(COMPILER_NAME)_OPT := -c -D__<(PREF)_BUILD -I<(INCDIR)
+ifdef DEFS
+    DEFS := $(DEFS:,= )
+    <(COMPILER_NAME)_OPT += $(DEFS:%="-D%")
+endif
+
+LD_OPT := -shared --subsystem=windows
+LD_OPT += --dynamicbase --high-entropy-va --large-address-aware --nxcompat
+LD_OPT += -L<(LIBDIR) <(LD_LIBS)
+
+ifeq "$(CFG)" "prod"
+	<(COMPILER_NAME)_OPT += -O3
+    LD_OPT += -s
+else
+	<(COMPILER_NAME)_OPT += -g -D__<(PREF)_DBG
+endif
+
+.PHONY: all __pre_all clean <(DLLNAME) $(OBJS) install install-headers uninstall
+.SUFFIXES:
+
+all: __pre_all <(DLLNAME)
+__pre_all:
+	mkdir -p <(BUILDDIR)
+clean:
+	rm -rf <(BUILDDIR)
+
+<(DLLNAME): $(OBJS)
+	ld $(OBJS:%=<(BUILDDIR)/%) -o<(BUILDDIR)/<(DLLNAME).dll --out-implib=<(BUILDDIR)/<(DLLNAME).lib $(LD_OPT)
+$(OBJS):
+	<(COMPILER_EXEC) src/$(@:%.obj=%.<(EXT)) -o<(BUILDDIR)/$@ $(<(COMPILER_NAME)_OPT)
+
+install: install-headers
+	install <(BUILDDIR)/<(DLLNAME).* "$(PREFIX)/$(LIBDIR)" -m755
+install-headers:
+	[ -d "$(PREFIX)/$(INCDIR)/<(DLLNAME)" ] || mkdir "$(PREFIX)/$(INCDIR)/<(DLLNAME)"
+	install <(INCDIR)/<(DLLNAME)/* "$(PREFIX)/$(INCDIR)/<(DLLNAME)" -m644
+uninstall:
+	rm -rf "$(PREFIX)/$(INCDIR)/<(DLLNAME)"
+	rm -f "$(PREFIX)/$(LIBDIR)/<(DLLNAME).*"

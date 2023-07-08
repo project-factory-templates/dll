@@ -1,0 +1,6 @@
+#ifndef <(DLLNAME_UPPER)
+#define <(DLLNAME_UPPER) 0x0100
+
+#include "<(DLLNAME)/base<(HDREXT)"
+
+#endif // guard

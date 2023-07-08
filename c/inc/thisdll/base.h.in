@@ -1,0 +1,6 @@
+#ifndef __<(PREF)_BASE_H
+#define __<(PREF)_BASE_H
+
+#include "<(DLLNAME)/sig.h"
+
+#endif // guard
