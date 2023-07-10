@@ -8,8 +8,8 @@ OBJS := $(SRCS:%.<(EXT)=%.obj)
 
 <(COMPILER_NAME)_OPT := -c -D__<(PREF)_BUILD -I<(INCDIR)
 ifdef DEFS
-    DEFS := $(DEFS:,= )
-    <(COMPILER_NAME)_OPT += $(DEFS:%="-D%")
+	DEFS := $(DEFS:,= )
+	<(COMPILER_NAME)_OPT += $(DEFS:%="-D%")
 endif
 
 LD_OPT := -shared --subsystem=windows
@@ -18,7 +18,7 @@ LD_OPT += -L<(LIBDIR) <(LD_LIBS)
 
 ifeq "$(CFG)" "prod"
 	<(COMPILER_NAME)_OPT += -O3
-    LD_OPT += -s
+	LD_OPT += -s
 else
 	<(COMPILER_NAME)_OPT += -g -D__<(PREF)_DBG
 endif
